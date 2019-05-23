@@ -9,13 +9,16 @@ x = [1,0]
 
 coef :: Float -> Polinomio
 coef c = [c]
+--funcion que sustituye a length
+lgth :: Polinomio -> Int
+lgth p = sum (map (const 1) p )
 
 --funcion que dado dos polinomios, devuelve la suma de estos
 sumar :: Polinomio -> Polinomio -> Polinomio
 sumar [] p2 = p2;
 sumar p1 [] = p1;
 --sumar p1 p2 = [(head p1) + (head p2)] ++ (sumar (tail p1) (tail p2))
-sumar p1 p2 = if (length p1 >= length p2)
+sumar p1 p2 = if (lgth p1 >= lgth p2)
 			  then zipWith (+) p1 (p2 ++ repeat 0)
 			  else zipWith (+) (p1 ++ repeat 0) p2
 
@@ -31,6 +34,7 @@ multSimple :: Float -> Polinomio -> Polinomio
 multSimple num pol = map (*num) pol
 
 --concatena un 0 para tener el polinomio adecuado para sumar
+multiplicarAntigua :: Polinomio -> Polinomio
 multiplicarAntigua p = 0:p
 
 --Funcion que dado dos polinomios, los multiplica
@@ -57,4 +61,4 @@ peval p num = (last p) + peval ( init (map (*num) p) ) num
 
 pderv :: Polinomio -> Polinomio
 pderv [] = []
-pderv p = zipWith (*) (init p) [((length p)*1.0)..0.0]
+pderv p = zipWith (*) (reverse (init p)) [1..]
