@@ -1,5 +1,5 @@
-import ArrayPolynomial
---import TupleListPolynomial
+--import ArrayPolynomial
+import TupleListPolynomial
 
 main = do
 		print p
