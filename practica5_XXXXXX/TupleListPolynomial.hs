@@ -42,17 +42,30 @@ suma a b =
 	else [ ( (fst(head a) + fst(head b)), snd(head b) )] ++ suma (tail a) (tail b)
 
 -------------------------------------------------------
+--devuelve la lista resultante de multiplicar la base de uno de los elementos
+--de un polinomio por las bases de otro polinomio
+bases :: Float -> [Float] -> [Float]
+bases flo basesPoli = map (flo*) basesPoli
+
+--devuelve la lista resultante de multiplicar el exponente de uno de los elementos
+--de un polinomio por los exponentes de otro polinomio
+exponentes :: Integer -> [Integer] -> [Integer]
+exponentes exp expPoli = map (exp+) expPoli
+
+--junta las dos listas generadas por la suma y multiplicación de 
+--los exponentes y las bases, respectivamente.
+mult2 :: TupleList -> TupleList -> TupleList
+mult2 ((a,b):p2s) p2 = zip (bases a (map fst p2)) (exponentes b (map snd p2))
+
+mult :: TupleList -> TupleList -> TupleList
+mult [] p2 = []
+mult p1 [] = []
+mult p1 p2 = suma (mult2 ([head(p1)]) p2) (mult (tail(p1)) p2)
+
 pmul :: [TupleList] -> TupleList
 pmul [] = []
 pmul (x:[]) = x
-pmul (a:xs) = mult a (padd xs)
+pmul (a:xs) = mult a (pmul xs)
 
-mult :: TupleList -> TupleList -> TupleList
-mult [] b = b
-mult a [] = a
-mult a b = 
-	if (snd(head a)) > (snd(head b)) 
-		then [ (head a) ] ++ mult (tail a) b
-	else if (snd(head a)) < (snd(head b))
-		then [ (head b) ] ++ mult a (tail b)
-	else [ ( (fst(head a) * fst(head b)), snd(head b) )] ++ mult (tail a) (tail b)
+
+--base, exponente

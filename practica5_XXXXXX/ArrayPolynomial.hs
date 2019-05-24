@@ -9,18 +9,25 @@ x = [1,0]
 
 coef :: Float -> Polinomio
 coef c = [c]
---funcion que sustituye a length
-lgth :: Polinomio -> Int
-lgth p = sum (map (const 1) p )
+
+zipWith' ::  Polinomio -> Polinomio -> Int -> Int -> Polinomio
+zipWith' p1 p2 longp1 longp2 = if (longp1 > longp2)
+								then [head p1] ++ zipWith' (tail p1) p2 (longp1-1) longp2
+							   else zipWith (+) p1 p2
+
+sumarLength :: Polinomio -> Int -> Polinomio -> Int -> Polinomio
+sumarLength p1 longp1 p2 longp2 = if (longp1 >= longp2)
+								  		--then zipWith (+) p1 p2
+								  		then zipWith' p1 p2 longp1 longp2
+								  		--else sumarLength p2 longp2 (headp1:p1) longp1
+								  		else zipWith' p2 p1 longp2 longp1
 
 --funcion que dado dos polinomios, devuelve la suma de estos
 sumar :: Polinomio -> Polinomio -> Polinomio
 sumar [] p2 = p2;
 sumar p1 [] = p1;
---sumar p1 p2 = [(head p1) + (head p2)] ++ (sumar (tail p1) (tail p2))
-sumar p1 p2 = if (lgth p1 >= lgth p2)
-			  then zipWith (+) p1 (p2 ++ repeat 0)
-			  else zipWith (+) (p1 ++ repeat 0) p2
+sumar p1 p2 = sumarLength p1 (length(p1)) p2 (length(p2))
+
 
 --funcion que dado una lista de polinomios, devuelve la suma de estos
 padd :: [Polinomio] -> Polinomio
@@ -35,17 +42,17 @@ multSimple num pol = map (*num) pol
 
 --concatena un 0 para tener el polinomio adecuado para sumar
 multiplicarAntigua :: Polinomio -> Polinomio
-multiplicarAntigua p = 0:p
+multiplicarAntigua p = p ++ [0]
 
 --Funcion que dado dos polinomios, los multiplica
 multiplicar :: Polinomio -> Polinomio -> Polinomio
 multiplicar [] p2 = []
 multiplicar p1 [] = []
-multiplicar (p:p1) p2 = let 
+multiplicar p1 p2 = let 
 							--multiplicamos como en el cole, desde las unidades
-							pVecesP2 = multSimple p p2
+							pVecesP2 = multSimple (last p1) p2
 							--recursividad quitando la cifra multiplicada antes
-							multResto = multiplicarAntigua ( multiplicar p1 p2 )
+							multResto = multiplicarAntigua ( multiplicar (init p1) p2 )
 						in 
 							sumar pVecesP2 multResto
 
@@ -59,6 +66,10 @@ peval :: Polinomio -> Float -> Float
 peval [] a = 0.0
 peval p num = (last p) + peval ( init (map (*num) p) ) num
 
+calcularDerivada :: Polinomio -> Int -> Polinomio
+calcularDerivada [] _ = []
+calcularDerivada (x:restoPol) tam = [x*(fromIntegral(tam))] ++ calcularDerivada restoPol (tam-1)
+
 pderv :: Polinomio -> Polinomio
 pderv [] = []
-pderv p = zipWith (*) (reverse (init p)) [1..]
+pderv p = calcularDerivada (init p) (length(p)-1)
